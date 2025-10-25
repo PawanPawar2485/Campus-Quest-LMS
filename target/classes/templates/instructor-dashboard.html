@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard | Campus Quest LMS</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .nav-links .btn-logout {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+
+        .nav-links .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .instructor-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--warning);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .instructor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .instructor-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--success);
+        }
+
+        .instructor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .instructor-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .instructor-card p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .card-link:hover {
+            color: var(--secondary);
+            gap: 12px;
+        }
+
+        .my-courses {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .course-list {
+            padding: 0;
+        }
+
+        .course-item {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .course-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .course-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .course-info {
+            flex: 1;
+        }
+
+        .course-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .course-stats {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-small:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .pending-grading {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .submission-item {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .submission-item:last-child {
+            border-bottom: none;
+        }
+
+        .submission-badge {
+            padding: 4px 12px;
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span>Campus Quest</span>
+            </a>
+            <div class="nav-links">
+                <a th:href="@{/api/courses}">My Courses</a>
+                <a th:href="@{/api/assignments}">Assignments</a>
+                <a th:href="@{/api/quizzes}">Quizzes</a>
+                <a th:href="@{/api/announcements}">Announcements</a>
+                <a th:href="@{/logout}" class="btn-logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Instructor Dashboard</h1>
+            <p>Create and manage courses, track student progress, and engage with your class</p>
+        </div>
+
+        <div class="instructor-stats">
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">My Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">87</div>
+                <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Assignments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">23</div>
+                <div class="stat-label">Pending Grading</div>
+            </div>
+        </div>
+
+        <div class="instructor-grid">
+            <div class="instructor-card">
+                <h3>Course Management</h3>
+                <p>Create and manage your courses, upload content, and organize modules</p>
+                <a th:href="@{/api/courses}" class="card-link">
+                    Manage Courses →
+                </a>
+            </div>
+           
+            <div class="instructor-card">
+                <h3>Assignment Creation</h3>
+                <p>Create assignments, set due dates, and manage submissions</p>
+                <a th:href="@{/api/assignments}" class="card-link">
+                    Create Assignments →
+                </a>
+            </div>
+           
+            <div class="instructor-card">
+                <h3>Quiz Management</h3>
+                <p>Design quizzes, set time limits, and monitor student performance</p>
+                <a th:href="@{/api/quizzes}" class="card-link">
+                    Manage Quizzes →
+                </a>
+            </div>
+           
+            <div class="instructor-card">
+                <h3>Grade Management</h3>
+                <p>Review submissions, provide feedback, and manage grades</p>
+                <a th:href="@{/api/submissions}" class="card-link">
+                    Grade Submissions →
+                </a>
+            </div>
+        </div>
+
+        <div class="my-courses">
+            <div class="section-header">
+                <h2>My Courses</h2>
+                <a th:href="@{/api/courses}" class="card-link">View All</a>
+            </div>
+            <div class="course-list">
+                <div class="course-item">
+                    <div class="course-icon">J</div>
+                    <div class="course-info">
+                        <div class="course-name">Introduction to Java</div>
+                        <div class="course-stats">24 Students • 5 Modules • 12 Assignments</div>
+                    </div>
+                    <div class="course-actions">
+                        <button class="btn-small">Manage</button>
+                    </div>
+                </div>
+                <div class="course-item">
+                    <div class="course-icon">S</div>
+                    <div class="course-info">
+                        <div class="course-name">Advanced Spring Boot</div>
+                        <div class="course-stats">18 Students • 6 Modules • 8 Assignments</div>
+                    </div>
+                    <div class="course-actions">
+                        <button class="btn-small">Manage</button>
+                    </div>
+                </div>
+                <div class="course-item">
+                    <div class="course-icon">A</div>
+                    <div class="course-info">
+                        <div class="course-name">AI Ethics</div>
+                        <div class="course-stats">32 Students • 4 Modules • 6 Assignments</div>
+                    </div>
+                    <div class="course-actions">
+                        <button class="btn-small">Manage</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pending-grading">
+            <div class="section-header">
+                <h2>Pending Grading</h2>
+                <span class="submission-badge">23 submissions</span>
+            </div>
+            <div class="course-list">
+                <div class="submission-item">
+                    <div class="course-info">
+                        <div class="course-name">Java Basics Quiz - 15 submissions</div>
+                        <div class="course-stats">Due: Nov 1, 2025</div>
+                    </div>
+                </div>
+                <div class="submission-item">
+                    <div class="course-info">
+                        <div class="course-name">Spring Project - 8 submissions</div>
+                        <div class="course-stats">Due: Nov 15, 2025</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

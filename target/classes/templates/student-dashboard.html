@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Campus Quest LMS</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #e63946;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .nav-links .btn-logout {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+
+        .nav-links .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .student-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--success);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .student-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--accent);
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .student-card p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .card-link:hover {
+            color: var(--secondary);
+            gap: 12px;
+        }
+
+        .upcoming-deadlines {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .deadline-list {
+            padding: 0;
+        }
+
+        .deadline-item {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .deadline-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .deadline-item:last-child {
+            border-bottom: none;
+        }
+
+        .deadline-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .deadline-info {
+            flex: 1;
+        }
+
+        .deadline-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .deadline-course {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .deadline-date {
+            text-align: right;
+        }
+
+        .date-badge {
+            padding: 8px 16px;
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .date-badge.urgent {
+            background: rgba(230, 57, 70, 0.2);
+            color: var(--danger);
+        }
+
+        .my-courses {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .course-item {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--gray);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .recent-activity {
+            margin-top: 3rem;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .activity-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .student-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .student-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .deadline-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .deadline-date {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .student-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a th:href="@{/student/dashboard}" class="logo">
+                <span>Campus Quest</span>
+            </a>
+            <div class="nav-links">
+                <a th:href="@{/student/courses}">View Courses</a>
+                <a th:href="@{/quizzes}">Take Quizzes</a>
+                <a th:href="@{/student/submissions}">My Submissions</a>
+                <a th:href="@{/student/assignments}">Assignments</a>
+                <a th:href="@{/logout}" class="btn-logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome to Your Dashboard</h1>
+            <p>Track your progress, submit assignments, and continue your learning journey</p>
+        </div>
+
+        <div class="student-stats">
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Enrolled Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Assignments Due</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">87%</div>
+                <div class="stat-label">Average Grade</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Completed Modules</div>
+            </div>
+        </div>
+
+        <div class="student-grid">
+            <div class="student-card">
+                <h3>Course Enrollment</h3>
+                <p>Browse available courses and enroll in new learning opportunities</p>
+                <a th:href="@{/student/courses}" class="card-link">
+                    View Courses →
+                </a>
+            </div>
+           
+            <div class="student-card">
+                <h3>Assignment Submission</h3>
+                <p>Submit your assignments and track submission status</p>
+                <a th:href="@{/student/assignments}" class="card-link">
+                    View Assignments →
+                </a>
+            </div>
+           
+            <div class="student-card">
+                <h3>Quiz Taking</h3>
+                <p>Take quizzes and assessments to test your knowledge</p>
+                <a th:href="@{/quizzes}" class="card-link">
+                    Take Quizzes →
+                </a>
+            </div>
+           
+            <div class="student-card">
+                <h3>Progress Tracking</h3>
+                <p>Monitor your learning progress and academic performance</p>
+                <a th:href="@{/student/submissions}" class="card-link">
+                    View Progress →
+                </a>
+            </div>
+
+            <div class="student-card">
+                <h3>Messages</h3>
+                <p>Communicate with instructors and classmates</p>
+                <a th:href="@{/messages}" class="card-link">
+                    Check Messages →
+                </a>
+            </div>
+
+            <div class="student-card">
+                <h3>Announcements</h3>
+                <p>Stay updated with important course announcements</p>
+                <a th:href="@{/announcements}" class="card-link">
+                    View Announcements →
+                </a>
+            </div>
+        </div>
+
+        <div class="upcoming-deadlines">
+            <div class="section-header">
+                <h2>Upcoming Deadlines</h2>
+                <span class="date-badge">3 pending</span>
+            </div>
+            <div class="deadline-list">
+                <div class="deadline-item">
+                    <div class="deadline-icon">J</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">Java Basics Quiz</div>
+                        <div class="deadline-course">Introduction to Java</div>
+                    </div>
+                    <div class="deadline-date">
+                        <span class="date-badge urgent">Due: Nov 1, 2025</span>
+                    </div>
+                </div>
+                <div class="deadline-item">
+                    <div class="deadline-icon">S</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">Spring Project</div>
+                        <div class="deadline-course">Advanced Spring Boot</div>
+                    </div>
+                    <div class="deadline-date">
+                        <span class="date-badge">Due: Nov 15, 2025</span>
+                    </div>
+                </div>
+                <div class="deadline-item">
+                    <div class="deadline-icon">D</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">SQL Schema Design</div>
+                        <div class="deadline-course">Database Design</div>
+                    </div>
+                    <div class="deadline-date">
+                        <span class="date-badge">Due: Nov 5, 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-courses">
+            <div class="section-header">
+                <h2>My Courses Progress</h2>
+                <a th:href="@{/student/courses}" class="card-link">View All</a>
+            </div>
+            <div class="deadline-list">
+                <div class="course-item">
+                    <div class="deadline-icon">J</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">Introduction to Java</div>
+                        <div class="deadline-course">Programming Fundamentals</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="progress-text">75%</div>
+                </div>
+                <div class="course-item">
+                    <div class="deadline-icon">S</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">Advanced Spring Boot</div>
+                        <div class="deadline-course">Backend Development</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <div class="progress-text">60%</div>
+                </div>
+                <div class="course-item">
+                    <div class="deadline-icon">D</div>
+                    <div class="deadline-info">
+                        <div class="deadline-name">Database Design</div>
+                        <div class="deadline-course">Data Management</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                    <div class="progress-text">45%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h2 style="margin-bottom: 1.5rem;">Recent Activity</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon">A1</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Assignment Submitted: Java Basics</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">Q1</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Quiz Completed: Spring Fundamentals</div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">M1</div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Module Available: Database Design</div>
+                        <div class="activity-time">2 days ago</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">⭐</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Grade Received: Java Assignment - 92%</div>
+                        <div class="activity-time">3 days ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
